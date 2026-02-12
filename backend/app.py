@@ -1,5 +1,5 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import pickle
@@ -370,6 +370,17 @@ def get_stats():
     
     stats_dict = {category: count for category, count in stats}
     return jsonify(stats_dict)
+    from flask import send_from_directory
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    frontend_dist = os.path.join(os.getcwd(), "frontend", "dist")
+
+    if path != "" and os.path.exists(os.path.join(frontend_dist, path)):
+        return send_from_directory(frontend_dist, path)
+
+    return send_from_directory(frontend_dist, "index.html") 
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
