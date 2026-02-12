@@ -1,0 +1,26 @@
+services:
+  # Backend Service
+  - type: web
+    name: mini-s6-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend.app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PORT
+        value: 10000
+
+  # Frontend Service
+  - type: static
+    name: mini-s6-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    publishDir: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: mini-s6-backend
+          property: url
