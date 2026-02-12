@@ -16,14 +16,14 @@ function Navbar() {
   if (['/login/user', '/login/admin', '/register'].includes(location.pathname)) {
     return (
       <nav className="navbar">
-        <Link to="/" className="logo">SwiggyCare AI</Link>
+        <Link to="/" className="logo">Zasty</Link>
       </nav>
     );
   }
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">SwiggyCare AI</Link>
+      <Link to="/" className="logo">Zasty</Link>
       <div className="nav-links">
         {/* Links conditionally based on auth would be better, but keeping simple */}
       </div>
