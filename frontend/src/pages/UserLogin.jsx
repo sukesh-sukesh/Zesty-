@@ -51,9 +51,7 @@ function UserLogin() {
                     Don't have an account? <Link to="/register">Register here</Link>
                 </p>
             </div>
-            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                <Link to="/login/admin" style={{ color: '#999', fontSize: '0.8rem' }}>Admin Access</Link>
-            </div>
+           
         </div>
     );
 }

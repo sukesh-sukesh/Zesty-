@@ -1,53 +1,62 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-import UserLogin from './pages/UserLogin';
-import AdminLogin from './pages/AdminLogin';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// User Pages
+import UserLogin from './pages/user/UserLogin';
 import Register from './pages/Register';
-import AdminRegister from './pages/AdminRegister';
-import UserDashboard from './pages/UserDashboard';
-import Admin from './pages/Admin';
+import UserLayout from './pages/user/UserLayout';
+import UserHome from './pages/user/UserHome';
+import RestaurantMenu from './pages/user/RestaurantMenu';
+import UserOrders from './pages/user/UserOrders';
+
+// Support Pages
+import SupportLogin from './pages/support/SupportLogin';
+import L1Dashboard from './pages/support/L1Dashboard';
+import L2Dashboard from './pages/support/L2Dashboard';
+
+// Admin Pages
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+
+// Master Admin Pages
+import MasterAdminLogin from './pages/master/MasterAdminLogin';
+import MasterAdminDashboard from './pages/master/MasterAdminDashboard';
+
 import './index.css';
-
-function Navbar() {
-  const location = useLocation();
-  // Don't show navbar on login pages if you want a clean look, or show minimal
-  if (['/login/user', '/login/admin', '/register'].includes(location.pathname)) {
-    return (
-      <nav className="navbar">
-        <Link to="/" className="logo">Zasty</Link>
-      </nav>
-    );
-  }
-
-  return (
-    <nav className="navbar">
-      <Link to="/" className="logo">Zasty</Link>
-      <div className="nav-links">
-        {/* Links conditionally based on auth would be better, but keeping simple */}
-      </div>
-    </nav>
-  );
-}
 
 function App() {
   return (
     <Router>
-      <div className="app">
-        <Navbar />
-        <div className="container">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login/user" element={<UserLogin />} />
-            <Route path="/login/admin" element={<AdminLogin />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/register/admin" element={<AdminRegister />} />
+      <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <Routes>
+          <Route path="/" element={<Navigate to="/user/login" replace />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/user/login" element={<UserLogin />} />
 
-            <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route path="/admin/dashboard" element={<Admin />} />
-          </Routes>
-        </div>
+          {/* New Swiggy-Style User Layout & Routing */}
+          <Route path="/user" element={<UserLayout />}>
+            <Route path="home" element={<UserHome />} />
+            <Route path="restaurant/:id" element={<RestaurantMenu />} />
+            <Route path="orders" element={<UserOrders />} />
+          </Route>
+
+          <Route path="/user/dashboard" element={<Navigate to="/user/home" replace />} />
+
+          <Route path="/support/login" element={<SupportLogin />} />
+          <Route path="/support/l1-dashboard" element={<L1Dashboard />} />
+          <Route path="/support/l2-dashboard" element={<L2Dashboard />} />
+
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+          <Route path="/master-admin/login" element={<MasterAdminLogin />} />
+          <Route path="/master-admin/dashboard" element={<MasterAdminDashboard />} />
+
+          {/* Legacy redirects */}
+          <Route path="/login/user" element={<Navigate to="/user/login" replace />} />
+          <Route path="/login/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route path="/master/login" element={<Navigate to="/master-admin/login" replace />} />
+        </Routes>
       </div>
     </Router>
   );

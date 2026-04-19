@@ -1,0 +1,79 @@
+mini-s6
+├── backend
+│   ├── app.py
+│   ├── complaints.db
+│   ├── complaints_dataset.csv
+│   ├── demo_db.py
+│   ├── generate_data.py
+│   ├── migrate_db.py
+│   ├── model.pkl
+│   ├── schema.txt
+│   ├── seed_db.py
+│   ├── setup_demo.py
+│   ├── train_model.py
+│   └── vectorizer.pkl
+├── frontend
+│   ├── public
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── assets
+│   │   │   ├── images
+│   │   │   │   └── foods
+│   │   │   │       └── default_food.jpg
+│   │   │   └── react.svg
+│   │   ├── components
+│   │   │   └── SidebarLayout.jsx
+│   │   ├── pages
+│   │   │   ├── admin
+│   │   │   │   ├── AdminDashboard.jsx
+│   │   │   │   └── AdminLogin.jsx
+│   │   │   ├── master
+│   │   │   │   ├── MasterAdminDashboard.jsx
+│   │   │   │   └── MasterAdminLogin.jsx
+│   │   │   ├── support
+│   │   │   │   ├── L1Dashboard.jsx
+│   │   │   │   ├── L2Dashboard.jsx
+│   │   │   │   └── SupportLogin.jsx
+│   │   │   ├── user
+│   │   │   │   ├── RestaurantMenu.jsx
+│   │   │   │   ├── UserDashboard.jsx
+│   │   │   │   ├── UserHome.jsx
+│   │   │   │   ├── UserLayout.jsx
+│   │   │   │   ├── UserLogin.jsx
+│   │   │   │   └── UserOrders.jsx
+│   │   │   ├── Admin.jsx
+│   │   │   ├── AdminLogin.jsx
+│   │   │   ├── AdminRegister.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── MasterDashboard.jsx
+│   │   │   ├── MasterLogin.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── SupportDashboard.jsx
+│   │   │   ├── SupportLogin.jsx
+│   │   │   ├── UserDashboard.jsx
+│   │   │   └── UserLogin.jsx
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── api.js
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .gitignore
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── output.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── puppeteer_test.cjs
+│   ├── puppeteer_test_master.cjs
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── DEPLOY_INSTRUCTIONS.md
+├── PLAN.md
+├── README.md
+├── get_tree.py
+├── render.yaml
+├── requirements.txt
+├── reset_db_users.py
+├── test_api.py
+└── tree_structure.txt

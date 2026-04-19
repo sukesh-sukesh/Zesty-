@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { predictComplaint, getRestaurants, placeOrder, getOrders } from '../api';
-import { ShoppingBag, CheckCircle, AlertCircle, XCircle, Search, MessageSquare, ArrowRight, X, Clock } from 'lucide-react';
+import { predictComplaint, getRestaurants, placeOrder, getOrders, getZones } from '../api';
+import { ShoppingBag, CheckCircle, AlertCircle, XCircle, Search, MessageSquare, ArrowRight, X, Clock, MapPin } from 'lucide-react';
 
 function UserDashboard() {
     const [activeTab, setActiveTab] = useState('food'); // 'food' or 'orders'
@@ -9,6 +9,8 @@ function UserDashboard() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [orderingId, setOrderingId] = useState(null); // specific restaurant being ordered from
+    const [zones, setZones] = useState([]);
+    const [selectedZone, setSelectedZone] = useState(1);
 
     // Complaint Modal State
     const [showComplaintModal, setShowComplaintModal] = useState(false);
@@ -27,7 +29,14 @@ function UserDashboard() {
         }
         fetchRestaurants();
         fetchMyOrders();
+        fetchZones();
     }, [user?.id, navigate]);
+
+    const fetchZones = async () => {
+        const data = await getZones();
+        setZones(data);
+        if (data.length > 0) setSelectedZone(data[0].zone_id);
+    };
 
     const fetchRestaurants = async () => {
         const data = await getRestaurants();
@@ -87,7 +96,7 @@ function UserDashboard() {
         setError('');
 
         try {
-            const data = await predictComplaint(complaintText, user.id, selectedOrder.id);
+            const data = await predictComplaint(complaintText, user.id, selectedOrder.id, selectedZone);
             if (data.error) {
                 setError(data.error);
             } else {
@@ -110,12 +119,24 @@ function UserDashboard() {
                     <h2>Hello, {user.username} 👋</h2>
                     <p className="text-muted">What's on your mind today?</p>
                 </div>
-                <button
-                    onClick={() => { sessionStorage.removeItem('user'); navigate('/login/user'); }}
-                    className="btn-secondary"
-                >
-                    Logout
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'white', padding: '5px 10px', borderRadius: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                        <MapPin size={16} color="#fc8019" />
+                        <select
+                            value={selectedZone}
+                            onChange={(e) => setSelectedZone(Number(e.target.value))}
+                            style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: 'bold' }}
+                        >
+                            {zones.map(z => <option key={z.zone_id} value={z.zone_id}>{z.zone_name}</option>)}
+                        </select>
+                    </div>
+                    <button
+                        onClick={() => { sessionStorage.removeItem('user'); navigate('/login/user'); }}
+                        className="btn-secondary"
+                    >
+                        Logout
+                    </button>
+                </div>
             </header>
 
             {/* Tabs */}

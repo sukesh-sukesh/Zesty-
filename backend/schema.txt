@@ -1,0 +1,66 @@
+CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'user'
+        )
+CREATE TABLE sqlite_sequence(name,seq)
+CREATE TABLE complaints (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            text TEXT NOT NULL,
+            category TEXT NOT NULL,
+            status TEXT DEFAULT 'Pending',
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, order_id INTEGER REFERENCES orders(id), admin_response_text TEXT, zone_id INTEGER REFERENCES zones(zone_id), department_id INTEGER REFERENCES departments(department_id),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+CREATE TABLE orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            restaurant_name TEXT NOT NULL,
+            items TEXT NOT NULL,
+            total_amount REAL NOT NULL,
+            order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'Delivered',
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+CREATE TABLE zones (
+        zone_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        zone_name TEXT UNIQUE NOT NULL,
+        district TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+CREATE TABLE departments (
+        department_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        department_name TEXT UNIQUE NOT NULL
+    )
+CREATE TABLE support_staff (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL,
+        zone_id INTEGER,
+        department_id INTEGER,
+        created_by_admin INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (zone_id) REFERENCES zones (zone_id),
+        FOREIGN KEY (department_id) REFERENCES departments (department_id)
+    )
+CREATE TABLE company_admin_registry (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        zone_id INTEGER NOT NULL,
+        admin_username TEXT UNIQUE NOT NULL,
+        admin_password TEXT NOT NULL,
+        created_by_company TEXT DEFAULT 'System',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (zone_id) REFERENCES zones (zone_id)
+    )
+CREATE TABLE complaint_compensation (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        complaint_id INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        amount REAL,
+        coupon_code TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (complaint_id) REFERENCES complaints (id)
+    )

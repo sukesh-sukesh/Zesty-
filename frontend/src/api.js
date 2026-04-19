@@ -31,9 +31,10 @@ export const registerUser = async (username, password, role = 'user') => {
 
 // --- Restaurants & Orders ---
 
-export const getRestaurants = async () => {
+export const getRestaurants = async (zone = '') => {
     try {
-        const response = await fetch(`${API_URL}/restaurants`);
+        const query = zone ? `?zone=${encodeURIComponent(zone)}` : '';
+        const response = await fetch(`${API_URL}/restaurants${query}`);
         return response.json();
     } catch (error) {
         return [];
@@ -64,12 +65,12 @@ export const getOrders = async (user_id) => {
 
 // --- Complaints ---
 
-export const predictComplaint = async (text, user_id, order_id) => {
+export const predictComplaint = async (text, user_id, order_id, zone_id = 1) => {
     try {
         const response = await fetch(`${API_URL}/predict`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, user_id, order_id }),
+            body: JSON.stringify({ text, user_id, order_id, zone_id }),
         });
         return response.json();
     } catch (error) {
@@ -118,5 +119,108 @@ export const getStats = async () => {
         return response.json();
     } catch (error) {
         return {};
+    }
+};
+
+// --- SYSTEM ---
+export const getZones = async () => {
+    try {
+        const res = await fetch(`${API_URL}/zones`);
+        return res.json();
+    } catch (e) {
+        return [];
+    }
+};
+
+export const getDepartments = async () => {
+    try {
+        const res = await fetch(`${API_URL}/departments`);
+        return res.json();
+    } catch (e) {
+        return [];
+    }
+};
+
+// --- LOGIN EXSTRAS ---
+export const supportLogin = async (username, password) => {
+    try {
+        const res = await fetch(`${API_URL}/support/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        return res.json();
+    } catch (e) {
+        return { error: 'Login failed' };
+    }
+};
+
+export const masterLogin = async (username, password) => {
+    try {
+        const res = await fetch(`${API_URL}/master/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        return res.json();
+    } catch (e) {
+        return { error: 'Login failed' };
+    }
+};
+
+// --- SUPPORT ACTIONS ---
+export const getSupportComplaints = async (zone_id, department_id = '') => {
+    try {
+        let url = `${API_URL}/support/complaints?zone_id=${zone_id}`;
+        if (department_id) url += `&department_id=${department_id}`;
+        const res = await fetch(url);
+        return res.json();
+    } catch (e) {
+        return [];
+    }
+};
+
+export const supportAction = async (data) => {
+    try {
+        const res = await fetch(`${API_URL}/support/action`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+        return res.json();
+    } catch (e) {
+        return { error: 'Action failed' };
+    }
+};
+
+// --- MASTER ADMIN ACTIONS ---
+export const getMasterStats = async (zone_id) => {
+    try {
+        const res = await fetch(`${API_URL}/master/stats?zone_id=${zone_id}`);
+        return res.json();
+    } catch (e) {
+        return {};
+    }
+};
+
+export const getMasterStaff = async (zone_id) => {
+    try {
+        const res = await fetch(`${API_URL}/master/staff?zone_id=${zone_id}`);
+        return res.json();
+    } catch (e) {
+        return [];
+    }
+};
+
+export const createStaff = async (data) => {
+    try {
+        const res = await fetch(`${API_URL}/master/staff`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+        return res.json();
+    } catch (e) {
+        return { error: 'Creation failed' };
     }
 };

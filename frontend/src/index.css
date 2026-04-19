@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #fc8019;
+  --color-primary-hover: #e86e0f;
+  --color-secondary: #1f2937;
+  --color-accent: #10b981;
+  --color-base-bg: #f8fafc;
+  --color-base-card: #ffffff;
+  --color-base-border: #e5e7eb;
+  --color-base-text: #111827;
+  --color-base-secondary-text: #6b7280;
+  --font-sans: 'Inter', sans-serif;
+}
+
 :root {
   --primary: #fc8019;
   /* Swiggy Orange */

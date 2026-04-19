@@ -10,11 +10,14 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
-DATABASE = 'backend/complaints.db'
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'complaints.db')
 
 # Load model and vectorizer
 try:
-    with open('backend/model.pkl', 'rb') as f:
+    with open(os.path.join(BASE_DIR, 'model.pkl'), 'rb') as f:
         model = pickle.load(f)
     print("Model loaded successfully.")
 except FileNotFoundError:
@@ -22,7 +25,7 @@ except FileNotFoundError:
     model = None
 
 try:
-    with open('backend/vectorizer.pkl', 'rb') as f:
+    with open(os.path.join(BASE_DIR, 'vectorizer.pkl'), 'rb') as f:
         vectorizer = pickle.load(f)
     print("Vectorizer loaded successfully.")
 except FileNotFoundError:
@@ -30,56 +33,72 @@ except FileNotFoundError:
     vectorizer = None
 
 # Dummy Data for Restaurants
-DUMMY_RESTAURANTS = [
-    {
-        "id": 1,
-        "name": "Pizza Paradise",
-        "image": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500&auto=format&fit=crop&q=60",
-        "rating": 4.5,
-        "menu": [
-            {"id": 101, "name": "Margherita Pizza", "price": 250, "description": "Classic cheese pizza"},
-            {"id": 102, "name": "Pepperoni Feast", "price": 350, "description": "Spicy pepperoni slices"},
-            {"id": 103, "name": "Garlic Bread", "price": 120, "description": "Buttery garlic sticks"},
-            {"id": 104, "name": "Coke", "price": 60, "description": "Chilled cola"}
-        ]
-    },
-    {
-        "id": 2,
-        "name": "Burger Barn",
-        "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60",
-        "rating": 4.2,
-        "menu": [
-            {"id": 201, "name": "Classic Cheeseburger", "price": 180, "description": "Juicy beef patty with cheese"},
-            {"id": 202, "name": "Veggie Delight", "price": 150, "description": "Crispy veg patty"},
-            {"id": 203, "name": "French Fries", "price": 90, "description": "Crispy salted fries"},
-            {"id": 204, "name": "Milkshake", "price": 120, "description": "Chocolate thick shake"}
-        ]
-    },
-    {
-        "id": 3,
-        "name": "Sushi Spot",
-        "image": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&auto=format&fit=crop&q=60",
-        "rating": 4.8,
-        "menu": [
-            {"id": 301, "name": "Salmon Nigiri", "price": 400, "description": "Fresh salmon on rice"},
-            {"id": 302, "name": "California Roll", "price": 350, "description": "Crab and avocado roll"},
-            {"id": 303, "name": "Miso Soup", "price": 100, "description": "Traditional soybean soup"},
-            {"id": 304, "name": "Green Tea", "price": 50, "description": "Hot matcha tea"}
-        ]
-    },
-     {
-        "id": 4,
-        "name": "Taco Town",
-        "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&auto=format&fit=crop&q=60",
-        "rating": 4.3,
-        "menu": [
-            {"id": 401, "name": "Chicken Tacos", "price": 200, "description": "Grilled chicken with salsa"},
-            {"id": 402, "name": "Beef Burrito", "price": 250, "description": "Loaded with beans and rice"},
-            {"id": 403, "name": "Nachos Supreme", "price": 180, "description": "Cheese, jalapenos, and cream"},
-            {"id": 404, "name": "Lemonade", "price": 70, "description": "Freshly squeezed"}
-        ]
-    }
+SOUTH_INDIAN_MENU = [
+    {"id": 1, "name": "Idli", "price": 40, "description": "Soft steamed rice cakes (2 pcs)"},
+    {"id": 2, "name": "Medu Vada", "price": 50, "description": "Crispy lentil donut"},
+    {"id": 3, "name": "Masala Dosa", "price": 80, "description": "Crispy crepe with potato filling"},
+    {"id": 4, "name": "Ghee Roast Dosa", "price": 100, "description": "Crispy crepe roasted in pure ghee"},
+    {"id": 5, "name": "Podi Dosa", "price": 90, "description": "Spicy lentil powder dusted dosa"},
+    {"id": 6, "name": "Set Dosa", "price": 110, "description": "Spongy dosa served in a set of 3"},
+    {"id": 7, "name": "Poori Masala", "price": 70, "description": "Fried fluffy bread with potato curry"},
+    {"id": 8, "name": "Upma", "price": 50, "description": "Savory semolina porridge"},
+    {"id": 9, "name": "Rava Dosa", "price": 90, "description": "Crispy semolina crepe"},
+    {"id": 10, "name": "Curd Rice", "price": 80, "description": "Tempered yogurt rice"},
+    {"id": 11, "name": "Sambar Rice", "price": 90, "description": "Lentil stew mixed with rice"},
+    {"id": 12, "name": "Lemon Rice", "price": 70, "description": "Tangy lemon flavored rice"},
+    {"id": 13, "name": "Tomato Rice", "price": 70, "description": "Spiced tomato rice"},
+    {"id": 14, "name": "Paneer Butter Masala", "price": 160, "description": "Paneer cubes in creamy tomato gravy"},
+    {"id": 15, "name": "South Indian Meals", "price": 150, "description": "Traditional full course meal"},
+    {"id": 16, "name": "Lassi", "price": 60, "description": "Sweet yogurt drink"},
+    {"id": 17, "name": "Buttermilk", "price": 40, "description": "Spiced refreshing buttermilk"}
 ]
+
+ZONES = {
+    'Coimbatore': ['Annapoorna Gowrishankar', 'Sree Annapoorna Sweets', 'Haribhavanam', 'Junior Kuppanna', 'A2B Adyar Ananda Bhavan'],
+    'Chennai': ['Murugan Idli Shop', 'Sangeetha Veg Restaurant', 'Saravana Bhavan', 'Hotel Junior Kuppanna'],
+    'Bangalore': ['CTR', 'Vidyarthi Bhavan', 'Rameshwaram Cafe', 'MTR', 'Sagar Fast Food'],
+    'Kochi': ['Dhe Puttu', 'Paragon Restaurant', 'Brindhavan Veg', 'Gokul Oottupura', 'Aryaas'],
+    'Hyderabad': ['Chutneys', 'Rayalaseema Ruchulu', 'Minerva Coffee Shop', 'Kamat Hotel', 'Bikanerwala']
+}
+
+RESTAURANT_IMAGES = {
+    'Annapoorna Gowrishankar': 'https://images.unsplash.com/photo-1610190217036-7c919d80d285?w=600&auto=format&fit=crop&q=80',
+    'Haribhavanam': 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=600&auto=format&fit=crop&q=80',
+    'A2B Adyar Ananda Bhavan': 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=600&auto=format&fit=crop&q=80',
+    'Junior Kuppanna': 'https://images.unsplash.com/photo-1627308595229-7830b5c91f9f?w=600&auto=format&fit=crop&q=80',
+    'Murugan Idli Shop': 'https://images.unsplash.com/photo-1589301773822-6b9dfaa3b5c6?w=600&auto=format&fit=crop&q=80',
+    'Saravana Bhavan': 'https://images.unsplash.com/photo-1610190217036-7c919d80d285?w=600&auto=format&fit=crop&q=80',
+    'Sangeetha Veg Restaurant': 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=600&auto=format&fit=crop&q=80',
+    'CTR': 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=600&auto=format&fit=crop&q=80',
+    'Vidyarthi Bhavan': 'https://images.unsplash.com/photo-1589301773822-6b9dfaa3b5c6?w=600&auto=format&fit=crop&q=80',
+    'Rameshwaram Cafe': 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=600&auto=format&fit=crop&q=80',
+    'Dhe Puttu': 'https://images.unsplash.com/photo-1627308595229-7830b5c91f9f?w=600&auto=format&fit=crop&q=80',
+    'Paragon Restaurant': 'https://images.unsplash.com/photo-1610190217036-7c919d80d285?w=600&auto=format&fit=crop&q=80',
+    'Brindhavan Veg': 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=600&auto=format&fit=crop&q=80',
+    'Chutneys': 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=600&auto=format&fit=crop&q=80',
+    'Minerva Coffee Shop': 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=600&auto=format&fit=crop&q=80',
+    'Rayalaseema Ruchulu': 'https://images.unsplash.com/photo-1627308595229-7830b5c91f9f?w=600&auto=format&fit=crop&q=80',
+}
+
+DEFAULT_FOOD_IMAGE = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80'
+
+DUMMY_RESTAURANTS = []
+r_id = 1
+import random
+rng = random.Random(42)  # Use consistent seed so it doesn't shuffle on reload
+for zone, names in ZONES.items():
+    for i, name in enumerate(names):
+        DUMMY_RESTAURANTS.append({
+            "id": r_id,
+            "name": name,
+            "zone": zone,
+            "image": RESTAURANT_IMAGES.get(name, DEFAULT_FOOD_IMAGE),
+            "rating": round(rng.uniform(4.0, 4.9), 1),
+            "delivery_time": f"{rng.randint(20, 45)} mins",
+            "tags": ["South Indian", "Breakfast", "Meals"],
+            "menu": SOUTH_INDIAN_MENU
+        })
+        r_id += 1
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -141,8 +160,103 @@ def init_db():
     except sqlite3.OperationalError:
         pass # Column likely exists
 
+    # Additional Tables for Multi-tier System
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS zones (
+            zone_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            zone_name TEXT UNIQUE NOT NULL,
+            district TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS departments (
+            department_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            department_name TEXT UNIQUE NOT NULL
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS support_staff (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL,
+            zone_id INTEGER,
+            department_id INTEGER,
+            created_by_admin INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (zone_id) REFERENCES zones (zone_id),
+            FOREIGN KEY (department_id) REFERENCES departments (department_id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS company_admin_registry (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            zone_id INTEGER NOT NULL,
+            admin_username TEXT UNIQUE NOT NULL,
+            admin_password TEXT NOT NULL,
+            created_by_company TEXT DEFAULT 'System',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (zone_id) REFERENCES zones (zone_id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS complaint_compensation (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            complaint_id INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            amount REAL,
+            coupon_code TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (complaint_id) REFERENCES complaints (id)
+        )
+    ''')
+
+    try:
+        cursor.execute('ALTER TABLE complaints ADD COLUMN zone_id INTEGER REFERENCES zones(zone_id)')
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute('ALTER TABLE complaints ADD COLUMN department_id INTEGER REFERENCES departments(department_id)')
+    except sqlite3.OperationalError:
+        pass
+
+    # Ensure default zones and departments exist
+    default_zones = [('Chennai', 'Chennai District'), ('Bangalore', 'Urban'), ('Hyderabad', 'Hyderabad District')]
+    for name, dist in default_zones:
+        try:
+            cursor.execute('INSERT INTO zones (zone_name, district) VALUES (?, ?)', (name, dist))
+        except sqlite3.IntegrityError:
+            pass
+
+    default_depts = ['Finance', 'Delivery', 'Restaurant', 'App Issue']
+    for dept in default_depts:
+        try:
+            cursor.execute('INSERT INTO departments (department_name) VALUES (?)', (dept,))
+        except sqlite3.IntegrityError:
+            pass
+
     conn.commit()
     
+    # Ensure Zone Admins exist
+    cursor.execute('SELECT zone_id, zone_name FROM zones')
+    zones = cursor.fetchall()
+    for row in zones:
+        z_id, z_name = row['zone_id'], row['zone_name']
+        admin_uname = f'{z_name.lower()}_admin'
+        admin_pass = generate_password_hash('admin123')
+        try:
+            cursor.execute('INSERT INTO company_admin_registry (zone_id, admin_username, admin_password) VALUES (?, ?, ?)',
+                           (z_id, admin_uname, admin_pass))
+        except sqlite3.IntegrityError:
+            pass
+    conn.commit()
+
     # Check if admin exists, if not create one
     cursor.execute("SELECT * FROM users WHERE role = 'admin'")
     if not cursor.fetchone():
@@ -214,6 +328,10 @@ def login():
 
 @app.route('/api/restaurants', methods=['GET'])
 def get_restaurants():
+    zone = request.args.get('zone')
+    if zone:
+        filtered = [r for r in DUMMY_RESTAURANTS if r.get('zone', '').lower() == zone.lower()]
+        return jsonify(filtered)
     return jsonify(DUMMY_RESTAURANTS)
 
 @app.route('/api/orders', methods=['POST'])
@@ -267,6 +385,7 @@ def predict_complaint():
     text = data.get('text', '')
     user_id = data.get('user_id') 
     order_id = data.get('order_id') # New field
+    zone_id = data.get('zone_id', 1) # Support zone assignment
     
     if not text:
         return jsonify({'error': 'No text provided'}), 400
@@ -280,8 +399,8 @@ def predict_complaint():
     # Save to DB
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO complaints (user_id, order_id, text, category, status) VALUES (?, ?, ?, ?, ?)", 
-                  (user_id, order_id, text, predicted_category, 'Pending'))
+    cursor.execute("INSERT INTO complaints (user_id, order_id, text, category, status, zone_id) VALUES (?, ?, ?, ?, ?, ?)", 
+                  (user_id, order_id, text, predicted_category, 'Pending', zone_id))
     complaint_id = cursor.lastrowid
     conn.commit()
     conn.close()
@@ -370,6 +489,184 @@ def get_stats():
     
     stats_dict = {category: count for category, count in stats}
     return jsonify(stats_dict)
+
+# --- SYSTEM & REGISTRY DATA ---
+
+@app.route('/api/zones', methods=['GET'])
+def get_zones():
+    conn = get_db_connection()
+    zones = conn.execute("SELECT * FROM zones").fetchall()
+    conn.close()
+    return jsonify([dict(z) for z in zones])
+
+@app.route('/api/departments', methods=['GET'])
+def get_departments():
+    conn = get_db_connection()
+    depts = conn.execute("SELECT * FROM departments").fetchall()
+    conn.close()
+    return jsonify([dict(d) for d in depts])
+
+# --- NEW SUPPORT & MASTER LOGIN ---
+
+@app.route('/api/support/login', methods=['POST'])
+def support_login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    role = data.get('role', 'support') # could be L1 or L2 or just generic support
+    
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM support_staff WHERE username = ?", (username,)).fetchone()
+    conn.close()
+    
+    if user and user['password'] == password: # using plain text or basic comparison as per dummy data if not hashed. Real systems use hashing. Let's assume plain or hash check depending on insertion. We'll use pass in our implementation for simplicity, or check_password_hash if needed. For now plain since we might insert plain in dashboard.
+        if role and role not in ['support', user['role']]:
+            return jsonify({'error': 'Role mismatch'}), 403
+            
+        return jsonify({
+            'message': 'Login successful',
+            'user': dict(user)
+        }), 200
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+@app.route('/api/master/login', methods=['POST'])
+def master_login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM company_admin_registry WHERE admin_username = ?", (username,)).fetchone()
+    conn.close()
+    
+    if user and check_password_hash(user['admin_password'], password):
+        return jsonify({
+            'message': 'Master Login successful',
+            'user': {
+                'id': user['id'],
+                'username': user['admin_username'],
+                'role': 'master',
+                'zone_id': user['zone_id']
+            }
+        }), 200
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+# --- MULTI-TIER COMPLAINT HANDLING ---
+
+@app.route('/api/support/complaints', methods=['GET'])
+def get_support_complaints():
+    zone_id = request.args.get('zone_id')
+    department_id = request.args.get('department_id')
+    
+    conn = get_db_connection()
+    query = "SELECT c.*, u.username as user_name, o.restaurant_name, o.items, o.total_amount FROM complaints c JOIN users u ON c.user_id = u.id LEFT JOIN orders o ON c.order_id = o.id WHERE c.zone_id = ?"
+    params = [zone_id]
+    
+    if department_id:
+        query += " AND c.department_id = ? AND c.status IN ('Forwarded to Department', 'Under Investigation', 'Resolved')"
+        params.append(department_id)
+        
+    query += " ORDER BY c.timestamp DESC"
+    rows = conn.execute(query, params).fetchall()
+    
+    # Also fetch compensation for each complaint
+    complaints = [dict(row) for row in rows]
+    for c in complaints:
+        comp = conn.execute("SELECT * FROM complaint_compensation WHERE complaint_id = ?", (c['id'],)).fetchall()
+        c['compensations'] = [dict(x) for x in comp]
+        
+    conn.close()
+    return jsonify(complaints)
+
+@app.route('/api/support/action', methods=['POST'])
+def support_action():
+    data = request.json
+    complaint_id = data.get('complaint_id')
+    action = data.get('action') # 'Verify', 'Reject', 'Resolve', 'Forward'
+    admin_text = data.get('admin_response_text', '')
+    department_id = data.get('department_id')
+    
+    conn = get_db_connection()
+    
+    if action == 'Forward':
+        new_status = 'Forwarded to Department'
+        conn.execute("UPDATE complaints SET status = ?, admin_response_text = ?, department_id = ? WHERE id = ?",
+                    (new_status, admin_text, department_id, complaint_id))
+    elif action == 'Resolve':
+        new_status = 'Resolved'
+        conn.execute("UPDATE complaints SET status = ?, admin_response_text = ? WHERE id = ?",
+                    (new_status, admin_text, complaint_id))
+        
+        # Handle compensation
+        comp_type = data.get('compensation_type', None)
+        comp_amt = data.get('compensation_amount')
+        comp_code = data.get('coupon_code')
+        if comp_type:
+             conn.execute("INSERT INTO complaint_compensation (complaint_id, type, amount, coupon_code) VALUES (?, ?, ?, ?)",
+                         (complaint_id, comp_type, comp_amt, comp_code))
+    else:
+        # e.g. Reject, Verify (as 'Verified by L1')
+        status_map = {'Verify': 'Verified by L1', 'Reject': 'Rejected'}
+        new_status = status_map.get(action, 'Pending')
+        conn.execute("UPDATE complaints SET status = ?, admin_response_text = ? WHERE id = ?",
+                    (new_status, admin_text, complaint_id))
+                    
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Action applied successfully'})
+
+# --- MASTER ADMIN FEATURES ---
+
+@app.route('/api/master/staff', methods=['POST', 'GET'])
+def master_staff():
+    conn = get_db_connection()
+    
+    if request.method == 'POST':
+        data = request.json
+        uname = data.get('username')
+        pwd = data.get('password') # Plain string for simplified dashboards, or hashed if preferred. Sticking to plain as handled in login.
+        role = data.get('role')
+        z_id = data.get('zone_id')
+        dep_id = data.get('department_id')
+        admin_id = data.get('admin_id')
+        
+        try:
+            conn.execute("INSERT INTO support_staff (username, password, role, zone_id, department_id, created_by_admin) VALUES (?, ?, ?, ?, ?, ?)",
+                        (uname, pwd, role, z_id, dep_id, admin_id))
+            conn.commit()
+            res = jsonify({'message': 'Account created'})
+            res.status_code = 201
+        except sqlite3.IntegrityError:
+            res = jsonify({'error': 'Username exists'})
+            res.status_code = 409
+        conn.close()
+        return res
+        
+    elif request.method == 'GET':
+        z_id = request.args.get('zone_id')
+        rows = conn.execute("SELECT * FROM support_staff WHERE zone_id = ?", (z_id,)).fetchall()
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+
+@app.route('/api/master/stats', methods=['GET'])
+def master_stats():
+    z_id = request.args.get('zone_id')
+    conn = get_db_connection()
+    
+    total = conn.execute("SELECT COUNT(*) as c FROM complaints WHERE zone_id = ?", (z_id,)).fetchone()['c']
+    pending = conn.execute("SELECT COUNT(*) as c FROM complaints WHERE zone_id = ? AND status != 'Resolved' AND status != 'Rejected'", (z_id,)).fetchone()['c']
+    resolved = conn.execute("SELECT COUNT(*) as c FROM complaints WHERE zone_id = ? AND status = 'Resolved'", (z_id,)).fetchone()['c']
+    
+    dept_stats = conn.execute("SELECT d.department_name, COUNT(c.id) as count FROM departments d LEFT JOIN complaints c ON d.department_id = c.department_id AND c.zone_id = ? GROUP BY d.department_id", (z_id,)).fetchall()
+    
+    conn.close()
+    
+    return jsonify({
+        'total': total,
+        'pending': pending,
+        'resolved': resolved,
+        'workload': {r['department_name']: r['count'] for r in dept_stats}
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
